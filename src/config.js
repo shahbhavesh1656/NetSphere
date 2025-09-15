@@ -1,0 +1,1 @@
+export const DB_NAME='Net_Sphere_application';
