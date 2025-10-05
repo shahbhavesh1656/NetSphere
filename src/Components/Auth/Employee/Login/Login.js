@@ -84,7 +84,7 @@ const Login = ({navigation})=>{
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                 secureTextEntry={true}
+                  secureTextEntry={true}
                   onChangeText={txt=>setpassword(txt)}
                   value={password}
                   placeholder="Enter your password"
