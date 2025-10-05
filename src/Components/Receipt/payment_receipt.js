@@ -1,160 +1,111 @@
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Button } from "react-native";
-import { Divider } from "react-native-paper";
-import { useSelector } from "react-redux";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const Paymentreceipt = ({ navigation }) => {
-  let today = new Date().toLocaleDateString();
+const PaymentReceipt = ({ route, navigation }) => {
+  const { customer, packageDetails } = route.params || {};
 
-  const user = useSelector(state => state.customer.value);
-  const conn = useSelector(state => state.bookconnection.value);
+  if (!customer || !packageDetails) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Payment details not available</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const transactionId = `#TXN${Math.floor(100000 + Math.random() * 900000)}`;
+  const currentDate = new Date().toLocaleDateString();
+
+  const handleDownloadReceipt = () => {
+    Alert.alert(
+      "📄 Receipt Downloaded",
+      `Receipt for ${packageDetails.title} (₹${packageDetails.price}) has been saved successfully.`,
+      [{ text: "OK" }]
+    );
+  };
+
   return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={styles.container}>
-          <Divider />
-          <Text />
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 10,
-              fontSize: 26,
-              color: "black"
-            }}
-          >
-            CASH RECEIPT
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
+        <Text style={styles.title}>✅ Payment Successful</Text>
+
+        <View style={styles.successCard}>
+          <Text style={styles.label}>Customer Name</Text>
+          <Text style={styles.value}>{customer.name}</Text>
+
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.value}>{customer.email}</Text>
+
+          <Text style={styles.label}>Phone</Text>
+          <Text style={styles.value}>{customer.mobile}</Text>
+
+          <Text style={styles.label}>Plan</Text>
+          <Text style={styles.value}>{packageDetails.title}</Text>
+
+          <Text style={styles.label}>Amount Paid</Text>
+          <Text style={[styles.value, { color: "#10B981", fontSize: 20 }]}>
+            ₹{packageDetails.price}
           </Text>
-          <Text />
-          <Divider />
-          <Text />
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            name: {user.name}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            mobile: {user.mobile}
-          </Text>
-          <Text />
-          <Divider />
-          <Text />
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Amount: {conn.amount}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Status: {conn.payment_status}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Date: {today}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Payment mode: Card
-          </Text>
-          <Text />
-          <Divider />
-          <Text />
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Area: {conn.area}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Type: {conn.connection_name}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Mode: {conn.connection_mode}
-          </Text>
-          <Text
-            style={{
-              textAlign: "center",
-              margin: 8,
-              fontSize: 22,
-              color: "black"
-            }}
-          >
-            Package: {conn.package}
-          </Text>
-          <Text />
-          <Divider />
-          <Text />
-          <Button
-            title="Back To Home"
-            color="black"
-            style={{ borderRadius: "10px" }}
-            onPress={() => navigation.navigate("CustomerHomePage")}
-          />
-          <Text />
+
+          <Text style={styles.label}>Transaction ID</Text>
+          <Text style={styles.value}>{transactionId}</Text>
+
+          <Text style={styles.label}>Date</Text>
+          <Text style={styles.value}>{currentDate}</Text>
         </View>
+
+        {/* Download Receipt */}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: "#10B981" }]}
+          onPress={handleDownloadReceipt}
+        >
+          <Text style={styles.buttonText}>Download Receipt</Text>
+        </TouchableOpacity>
+
+        {/* Done Button → Go Home */}
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: "#3B82F6", marginTop: 12 }]}
+          onPress={() => navigation.navigate("Home")}
+        >
+          <Text style={styles.buttonText}>Done</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    marginTop: 0,
-    backgroundColor: "yellow"
-  }
+  container: { flex: 1, backgroundColor: "#F8FAFC" },
+  title: { fontSize: 26, fontWeight: "700", marginBottom: 24, textAlign: "center", color: "#16a34a" },
+  successCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    borderLeftWidth: 5,
+    borderLeftColor: "#10B981",
+    shadowColor: "#1E293B",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  label: { fontSize: 14, color: "#64748B", marginTop: 16, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 },
+  value: { fontSize: 18, fontWeight: "600", color: "#1E293B", marginBottom: 8 },
+  button: {
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  buttonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700", letterSpacing: 0.5 },
+  errorText: { fontSize: 18, color: "#EF4444", textAlign: "center", marginTop: 50 },
 });
-export default Paymentreceipt;
+
+export default PaymentReceipt;

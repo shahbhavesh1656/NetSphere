@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TextInput, Button, Image } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ScrollView } from "react-native";
 import { openDatabase } from "react-native-sqlite-storage";
 import { DB_NAME } from "../../../../config";
+
 let db = openDatabase({ name: DB_NAME });
+
 const Signup = ({ navigation }) => {
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
@@ -10,20 +12,16 @@ const Signup = ({ navigation }) => {
   const [address, setaddress] = useState("");
   const [area, setarea] = useState("");
   const [mobile, setmobile] = useState("");
+
   useEffect(() => {
     db.transaction(txn => {
       txn.executeSql(
-        // "SELECT * FROM table_user",
         "SELECT name FROM sqlite_master WHERE type='table' AND name='table_employee'",
         [],
         (tx, res) => {
-          for (let i = 0; i < res.rows.length; ++i) {
-            console.log(res.rows.item(i));
-          }
-          console.log("item:", res.rows.length);
           if (res.rows.length == 0) {
             txn.executeSql(
-              "CREATE TABLE IF NOT EXISTS table_employee(emp_id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), email VARCHAR(50),password VARCHAR(50), address VARCHAR(100),area VARCHAR(50),mobile VARCHAR(12))",
+              "CREATE TABLE IF NOT EXISTS table_employee(emp_id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), email VARCHAR(50), password VARCHAR(50), address VARCHAR(100), area VARCHAR(50), mobile VARCHAR(12))",
               []
             );
           }
@@ -34,8 +32,8 @@ const Signup = ({ navigation }) => {
       );
     });
   }, []);
-  const handleSubmit = e => {
-    e.preventDefault();
+
+  const handleSubmit = () => {
     if (
       name === "" ||
       email === "" ||
@@ -44,18 +42,17 @@ const Signup = ({ navigation }) => {
       area === "" ||
       mobile === ""
     ) {
-      alert("please fill all fields");
-    } else if (email.slice(-10) != "@gmail.com") {
-      alert("enter valid email");
-    } else if (mobile.length < 10 || mobile.length > 10) {
-      alert("mobile number must have 10 digits");
+      alert("Please fill in all required fields");
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      alert("Please enter a valid email address");
+    } else if (mobile.length !== 10 || !/^[0-9]+$/.test(mobile)) {
+      alert("Please enter a valid 10-digit mobile number");
     } else {
       db.transaction(function(tx) {
         tx.executeSql(
-          "INSERT INTO table_employee (name, email,password, address,area, mobile) VALUES (?,?,?,?,?,?)",
+          "INSERT INTO table_employee (name, email, password, address, area, mobile) VALUES (?,?,?,?,?,?)",
           [name, email, password, address, area, mobile],
           (tx, results) => {
-            console.log("Results", results.rowsAffected);
             if (results.rowsAffected > 0) {
               alert("Employee Created Successfully");
             } else alert("Registration Failed");
@@ -67,121 +64,191 @@ const Signup = ({ navigation }) => {
       });
     }
   };
-  const handleusernamechange = input => {
-    const newText = input.replace(/[^A-Za-z]/g, "");
+
+  const handleNameChange = (input) => {
+    const newText = input.replace(/[^A-Za-z\s]/g, "");
     setname(newText);
   };
-  const handleaddresschange = input => {
-    const newText = input.replace(/[^A-Za-z]/g, "");
+
+  const handleAddressChange = (input) => {
+    const newText = input.replace(/[^A-Za-z0-9\s,.-]/g, "");
     setaddress(newText);
   };
+
+  const handleMobileChange = (input) => {
+    const newText = input.replace(/[^0-9]/g, "");
+    setmobile(newText);
+  };
+
   return (
-    <View style={styles.Container}>
-      <Image
-        source={{
-          uri:
-            "https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw"
-        }}
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          width: 100,
-          height: 100,
-          resizeMode: "contain"
-        }}
-      />
-      <Text style={styles.Text}>CREATE EMPLOYEE</Text>
-      <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={handleusernamechange}
-          placeholderTextColor="black"
-          color="black"
-          value={name}
-          placeholder="Enter Name"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={txt => setemail(txt)}
-          color="black"
-          value={email}
-          placeholder="Enter Email"
-          placeholderTextColor="black"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={txt => setpassword(txt)}
-          value={password}
-          secureTextEntry={true}
-          color="black"
-          placeholder="Enter Password"
-          placeholderTextColor="black"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={handleaddresschange}
-          value={address}
-          placeholder="Enter Address"
-          color="black"
-          placeholderTextColor="black"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={txt => setarea(txt)}
-          value={area}
-          placeholder="Enter Area"
-          color="black"
-          placeholderTextColor="black"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={txt => setmobile(txt)}
-          value={mobile}
-          placeholder="Enter Mobile"
-          color="black"
-          placeholderTextColor="black"
-        />
-        <Button
-          title="SignUp"
-          color="green"
-          style={{ borderRadius: "10px" }}
-          onPress={handleSubmit}
-        />
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.innerContainer}>
+        <View style={styles.card}>
+          {/* Logo */}
+          <View style={styles.logoContainer}>
+            <Image
+              source={{
+                uri: "https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw"
+              }}
+              style={styles.logo}
+            />
+          </View>
+
+          {/* Header */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Join Our Team</Text>
+            <Text style={styles.subtitle}>Create your employee account</Text>
+          </View>
+
+          {/* Form */}
+          <View style={styles.formContainer}>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={handleNameChange}
+                placeholderTextColor="#64748B"
+                value={name}
+                placeholder="Full Name"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={txt => setemail(txt)}
+                value={email}
+                placeholder="Work Email"
+                placeholderTextColor="#64748B"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={txt => setpassword(txt)}
+                value={password}
+                secureTextEntry={true}
+                placeholder="Create Password"
+                placeholderTextColor="#64748B"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={handleAddressChange}
+                value={address}
+                placeholder="Address"
+                placeholderTextColor="#64748B"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={txt => setarea(txt)}
+                value={area}
+                placeholder="Area"
+                placeholderTextColor="#64748B"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                onChangeText={handleMobileChange}
+                maxLength={10}
+                value={mobile}
+                placeholder="Mobile Number"
+                placeholderTextColor="#64748B"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            {/* Sign Up Button */}
+            <TouchableOpacity style={styles.signupButton} onPress={handleSubmit}>
+              <Text style={styles.signupButtonText}>Create Employee Account</Text>
+            </TouchableOpacity>
+
+            {/* Login Link */}
+            <TouchableOpacity
+              style={styles.loginLinkContainer}
+              onPress={() => navigation.navigate("EmployeeLogin")}
+            >
+              <Text style={styles.loginLinkText}>
+                Already have an account? <Text style={styles.loginLink}>Sign In</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-      <Text
-        style={styles.Text1}
-        onPress={() => navigation.navigate("EmployeeLogin")}
-      >
-        Already have a account ? Login
-      </Text>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  Container: {
-    margin: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: 30,
-    padding: 20
-  },
-  Text: {
-    fontSize: 22,
-    textAlign: "center",
-    color: "black"
-  },
-  Text1: {
-    fontSize: 19,
-    textAlign: "center",
-    color: "black"
-  },
-  input: {
-    height: 40,
-    margin: 12,
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  innerContainer: { paddingHorizontal: 20, paddingTop: 50, paddingBottom: 30 },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    shadowColor: '#1E293B',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
     borderWidth: 1,
-    borderRadius: 10
-  }
+    borderColor: '#E2E8F0',
+  },
+  logoContainer: { alignItems: 'center', marginBottom: 32 },
+  logo: { width: 100, height: 100, resizeMode: 'contain' },
+  headerContainer: { alignItems: 'center', marginBottom: 40 },
+  title: { fontSize: 32, fontWeight: '700', color: '#1E293B', marginBottom: 12, fontFamily: 'Poppins-Bold', textAlign: 'center' },
+  subtitle: { fontSize: 18, color: '#64748B', fontFamily: 'Poppins-Regular', textAlign: 'center' },
+  formContainer: { gap: 20 },
+  inputContainer: { marginBottom: 4 },
+  input: {
+    height: 60,
+    backgroundColor: '#F8FAFC',
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    color: '#1E293B',
+    fontFamily: 'Poppins-Regular',
+    shadowColor: '#E2E8F0',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  signupButton: {
+    height: 60,
+    backgroundColor: '#3B82F6',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  signupButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: 'Poppins-SemiBold',
+    letterSpacing: 0.5,
+  },
+  loginLinkContainer: { alignItems: 'center', marginTop: 24 },
+  loginLinkText: { fontSize: 16, color: '#64748B', fontFamily: 'Poppins-Regular' },
+  loginLink: { color: '#3B82F6', fontWeight: '600', fontFamily: 'Poppins-SemiBold' },
 });
 
 export default Signup;

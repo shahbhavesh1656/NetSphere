@@ -94,38 +94,80 @@ width: 100,
      
 
       </View>
-            {/* <Button title="View Complaints" color="green"style={{borderRadius:"10px"}} onPress={()=>navigation.navigate("ViewComplaints")} /> */}
+            {<Button title="View Complaints" color="green"style={{borderRadius:"10px"}} onPress={()=>navigation.navigate("ViewComplaints")} /> }
 
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    Container:{
-        margin:"auto",
-        display:"flex",
-        flexDirection:"column",
-        gap:30
-        ,padding:20
-    },
-    Text:{
-        fontSize:22,
-        textAlign:"center",
-        color:"black"
-    },
-    Text1:{
-        fontSize:19,
-        textAlign:"center",
-        color:"black"
-    },
-     input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    borderRadius:10,
+  container: {
+    flex: 1,
+    backgroundColor: '#F9F9FF',
+    justifyContent: 'center',
   },
- 
-})
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  mainContainer: {
+    padding: 24,
+    minHeight: '100%',
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#374151',
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  formCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 20,
+    marginVertical: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  input: {
+    height: 48,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#A5B4FC',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#EEF2FF',
+    color: '#1E293B',
+    fontSize: 16,
+  },
+  buttonContainer: {
+    borderRadius: 8,
+    backgroundColor: '#22C55E',
+    paddingVertical: 12,
+    marginTop: 8,
+    shadowColor: '#22C55E',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+});
 
 
 export default Addcomplaint;

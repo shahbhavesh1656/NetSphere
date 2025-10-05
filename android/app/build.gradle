@@ -73,7 +73,7 @@ android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    namespace "com.cable_master_application"
+    namespace "com.netsphere"
     defaultConfig {
         applicationId "com.netsphere"
         minSdkVersion rootProject.ext.minSdkVersion

@@ -1,104 +1,96 @@
-import React,{useState} from "react";
-import {StyleSheet,Text,View,Button,Image} from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { getBookedConnectionData } from "../../Stores/Reducers/book_connection";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const SelectArea = ({navigation})=>{
-    const [check, setcheck] = useState("");
-    const user = useSelector((state)=>state.customer.value);
-    const dispatch = useDispatch();
-    const handleSubmit = ()=>{
-        dispatch(getBookedConnectionData({
-             name: user.name,
-      email: user.email,
-      address: user.address,
-      area:check,
-      mobile: user.mobile,
-      connection_name:"",
-      connection_mode:"",
-      plan_name:"",
-      subscription:"",
-      payment_status:"",
-      connection_status:"",
-        }))
-       navigation.navigate("SelectConnection")
+const SelectArea = ({ navigation }) => {
+  const [check, setCheck] = useState("");
+  const user = useSelector((state) => state.customer.value);
+  const dispatch = useDispatch();
+
+  const areas = ["PATHARLI", "RAM NAGAR", "PENDSE NAGAR", "TILAK NAGAR", "GOPAL NAGAR"];
+
+  const handleSubmit = () => {
+    if (!check) {
+      alert("Please select an area");
+      return;
     }
-    return(
-        <View style={styles.Container}>
-          <Image source={{uri:"https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw"}}style={{
-marginLeft:"auto",
-marginRight:"auto",
-width: 100,
-    height: 100,
-    resizeMode: 'contain',
-  }}/>
-            <Text style={styles.Text}>CHOOSE AREA</Text>
-            <View style={styles.RadioButtonGroup}>
-       <View style={styles.RadioButton}>
+    dispatch(
+      getBookedConnectionData({
+        ...user,
+        area: check,
+        connection_name: "",
+        connection_mode: "",
+        plan_name: "",
+        subscription: "",
+        payment_status: "",
+        connection_status: "",
+      })
+    );
+    navigation.navigate("SelectConnection");
+  };
 
-              <RadioButton value="PATHARLI"status={check=='PATHARLI'?'checked':'unchecked'}onPress={()=>setcheck('PATHARLI')} color="black"/>
- <Text style={styles.Text1}>PATHARLI</Text>
-        </View> 
-        <View style={styles.RadioButton}>
-                         <RadioButton value="RAM NAGAR"status={check=='RAM NAGAR'?'checked':'unchecked'}onPress={()=>setcheck('RAM NAGAR')}/>
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}>
+        <View style={styles.card}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={{ uri: "https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw" }}
+              style={styles.logo}
+            />
+          </View>
 
-             <Text style={styles.Text1}>RAM NAGAR</Text>
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>Choose Service Area</Text>
+            <Text style={styles.subtitle}>Select your location for installation</Text>
+          </View>
 
-            </View>   
-            <View style={styles.RadioButton}>
-                             <RadioButton value="PENDSE NAGAR"status={check=='PENDSE NAGAR'?'checked':'unchecked'}onPress={()=>setcheck('PENDSE NAGAR')}/>
-      <Text style={styles.Text1}>PENDSE NAGAR</Text>
+          <View style={styles.areaContainer}>
+            {areas.map((area, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.areaOption, check === area && styles.selectedArea]}
+                onPress={() => setCheck(area)}
+              >
+                <RadioButton
+                  value={area}
+                  status={check === area ? "checked" : "unchecked"}
+                  onPress={() => setCheck(area)}
+                  color="#3B82F6"
+                />
+                <Text style={[styles.areaText, check === area && styles.selectedAreaText]}>{area}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-            </View>
-
-      <View style={styles.RadioButton}>
-                             <RadioButton value="TILAK NAGAR"status={check=='TILAK NAGAR'?'checked':'unchecked'}onPress={()=>setcheck('TILAK NAGAR')}/>
-      <Text style={styles.Text1}>TILAK NAGAR</Text>
-
-            </View>
- <View style={styles.RadioButton}>
-                             <RadioButton value="GOPAL NAGAR"status={check=='GOPAL NAGAR'?'checked':'unchecked'}onPress={()=>setcheck('GOPAL NAGAR')}/>
-      <Text style={styles.Text1}>GOPAL NAGAR</Text>
-
-            </View>
-
-      </View>
-       <Button title="NEXT" color="green"style={{borderRadius:"10px"}} onPress={handleSubmit} />
-              <Button title="CONNECTION HISTORY" color="green"style={{borderRadius:"10px"}} onPress={()=>navigation.navigate("ViewConnectionHistory")} />
-
+          <TouchableOpacity style={[styles.nextButton, !check && styles.disabledButton]} onPress={handleSubmit} disabled={!check}>
+            <Text style={styles.nextButtonText}>Continue</Text>
+          </TouchableOpacity>
         </View>
-    )
-}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    Container:{
-        margin:"auto",
-        display:"flex",
-        flexDirection:"column",
-        gap:50,
-        padding:20
-    },
-    Text:{
-        fontSize:22,
-        textAlign:"center",
-        color:"black"
-    },
-    RadioButton:{
-        display:"flex",
-        flexDirection:"row",
-        alignItems:"center"
-    },
-     RadioButtonGroup:{
-       gap:10
-    },
-    Text1:{
-        fontSize:19,
-        color:"black"
-    }
-    
- 
-})
-
+  container: { flex: 1, backgroundColor: "#F8FAFC" },
+  card: { backgroundColor: "#fff", borderRadius: 24, padding: 28, marginVertical: 20, shadowColor: "#1E293B", shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10, borderWidth: 1, borderColor: "#E2E8F0" },
+  logoContainer: { alignItems: "center", marginBottom: 24 },
+  logo: { width: 100, height: 100, resizeMode: "contain" },
+  headerContainer: { alignItems: "center", marginBottom: 32 },
+  title: { fontSize: 28, fontWeight: "700", color: "#1E293B", marginBottom: 6, textAlign: "center" },
+  subtitle: { fontSize: 16, color: "#64748B", textAlign: "center" },
+  areaContainer: { gap: 16, marginBottom: 32 },
+  areaOption: { flexDirection: "row", alignItems: "center", padding: 20, borderRadius: 16, borderWidth: 2, borderColor: "#E2E8F0", backgroundColor: "#F8FAFC" },
+  selectedArea: { borderColor: "#3B82F6", backgroundColor: "#EFF6FF" },
+  areaText: { fontSize: 18, color: "#64748B", marginLeft: 12 },
+  selectedAreaText: { color: "#1E293B", fontWeight: "600" },
+  nextButton: { height: 60, backgroundColor: "#3B82F6", borderRadius: 16, justifyContent: "center", alignItems: "center", shadowColor: "#3B82F6", shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 16, elevation: 8 },
+  disabledButton: { backgroundColor: "#94A3B8", shadowOpacity: 0.1 },
+  nextButtonText: { color: "#fff", fontSize: 18, fontWeight: "600" },
+});
 
 export default SelectArea;

@@ -1,95 +1,119 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Button, FlatList, Text } from "react-native";
+import { StyleSheet, View, FlatList, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { openDatabase } from "react-native-sqlite-storage";
 import { DB_NAME } from "../../config";
-import { Divider } from "react-native-paper";
-import { useSelector } from "react-redux";
 
 let db = openDatabase({ name: DB_NAME });
-const Viewattendance = ({ navigation }) => {
-  const [greviancelist, setgreviancelist] = useState([]);
-  const user = useSelector((state)=>state.employee.value);
-  console.log(user.email)
+
+const ViewAttendance = () => {
+  const [attendanceList, setAttendanceList] = useState([]);
+
   useEffect(() => {
     getData();
   }, []);
 
   const getData = () => {
-    db.transaction(txn => {
+    db.transaction((txn) => {
       txn.executeSql(
-        "SELECT * FROM table_attendance WHERE email=?",
-        [user.email],
+        "SELECT * FROM table_attendance",
+        [],
         (tx, res) => {
-          let menus = [];
-          for (let i = 0; i < res.rows.length; ++i) {
-            console.log(res.rows.item(i));
-            menus.push(res.rows.item(i));
+          let list = [];
+          for (let i = 0; i < res.rows.length; i++) {
+            list.push(res.rows.item(i));
           }
-          setgreviancelist(menus);
-          console.log("item:", res.rows.length);
-          if (res.rows.length == 0) {
-            txn.executeSql(
-              "CREATE TABLE IF NOT EXISTS table_attendance(emp_id INTEGER PRIMARY KEY AUTOINCREMENT, date VARCHAR(40), name VARCHAR(80), area VARCHAR(40), email VARCHAR(50),status VARCHAR(40))",
-              []
-            );
-          }
+          setAttendanceList(list);
         },
-        error => {
-          console.log(error);
-        }
+        (error) => console.log(error)
       );
     });
   };
-  
+
+  const renderItem = ({ item }) => {
+    const isPresent = item.status.toLowerCase() === "present";
+
+    return (
+      <View style={styles.attendanceCard}>
+        <View style={styles.dateHeader}>
+          <Text style={styles.dateText}>{item.date}</Text>
+          <View
+            style={[
+              styles.attendanceStatus,
+              isPresent ? styles.presentStatus : styles.absentStatus,
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                isPresent ? styles.presentText : styles.absentText,
+              ]}
+            >
+              {item.status}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.employeeDetails}>
+          <Text style={styles.detailValue}>Name: {item.name}</Text>
+          <Text style={styles.detailValue}>Area: {item.area}</Text>
+          <Text style={styles.detailValue}>Email: {item.email}</Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
-      <SafeAreaView>
-        <FlatList
-          data={greviancelist}
-          renderItem={({ item, index }) => {
-            return (
-              <View style={styles.listStyle}>
-               
-                <Text
-                 style={styles.text}
-                >
-                 Date - {item.date}
-                </Text>
-                <Text style={styles.text}>
-                  Name - {item.name}
-                </Text>
-                <Text style={styles.text}>
-                  Area - {item.area}
-                </Text>
-                <Text style={styles.text}>
-                  Status - {item.status}
-                </Text>
-                
-                <Divider/>
-              </View>
-            );
-          }}
-        />
-      </SafeAreaView>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={attendanceList}
+        keyExtractor={(item) => item.emp_id.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={{ padding: 16 }}
+      />
+    </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    marginTop: 10
+    flex: 1,
+    backgroundColor: "#F8FAFC",
   },
-  listStyle:{
-padding:10,
-marginBottom:10
+  attendanceCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  text: {
-    textAlign: "center",
-    fontSize: 20,
-    padding: 0,
-    color:"black"
-  }
+  dateHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1E293B",
+  },
+  attendanceStatus: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  presentStatus: { backgroundColor: "#D1FAE5" },
+  absentStatus: { backgroundColor: "#FEE2E2" },
+  statusText: { fontSize: 12, fontWeight: "600" },
+  presentText: { color: "#065F46" },
+  absentText: { color: "#DC2626" },
+  employeeDetails: { gap: 6 },
+  detailValue: { fontSize: 14, color: "#1E293B" },
 });
 
-export default Viewattendance;
+export default ViewAttendance;

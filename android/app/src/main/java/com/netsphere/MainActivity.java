@@ -1,4 +1,4 @@
-package com.cable_master_application;
+package com.netsphere;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
@@ -13,7 +13,7 @@ public class MainActivity extends ReactActivity {
    */
   @Override
   protected String getMainComponentName() {
-    return "cable_master_application";
+    return "net_sphere";
   }
 
   /**

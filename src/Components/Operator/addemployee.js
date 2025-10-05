@@ -1,181 +1,226 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TextInput, Button, Image } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert, ScrollView } from "react-native";
 import { openDatabase } from "react-native-sqlite-storage";
 import { DB_NAME } from "../../config";
+
 let db = openDatabase({ name: DB_NAME });
-const Addemployee = ({ navigation }) => {
+
+const Addemployee = () => {
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [address, setaddress] = useState("");
   const [area, setarea] = useState("");
   const [mobile, setmobile] = useState("");
+
   useEffect(() => {
-    db.transaction(txn => {
+    db.transaction((txn) => {
       txn.executeSql(
-        // "SELECT * FROM table_user",
         "SELECT name FROM sqlite_master WHERE type='table' AND name='table_employee'",
         [],
         (tx, res) => {
-          for (let i = 0; i < res.rows.length; ++i) {
-            console.log(res.rows.item(i));
-          }
-          console.log("item:", res.rows.length);
-          if (res.rows.length == 0) {
+          if (res.rows.length === 0) {
             txn.executeSql(
-              "CREATE TABLE IF NOT EXISTS table_employee(emp_id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), email VARCHAR(50),password VARCHAR(50), address VARCHAR(100),area VARCHAR(50),mobile VARCHAR(12))",
+              "CREATE TABLE IF NOT EXISTS table_employee(emp_id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(20), email VARCHAR(50), password VARCHAR(50), address VARCHAR(100), area VARCHAR(50), mobile VARCHAR(12))",
               []
             );
           }
         },
-        error => {
-          console.log(error);
+        (error) => {
+          console.log("SQL Error:", error);
         }
       );
     });
   }, []);
-  const handleSubmit = e => {
-    e.preventDefault();
-    if (
-      name === "" ||
-      email === "" ||
-      password === "" ||
-      address === "" ||
-      area === "" ||
-      mobile === ""
-    ) {
-      alert("please fill all fields");
-    } else if (email.slice(-10) != "@gmail.com") {
-      alert("enter valid email");
-    }  else if (mobile.length < 10 || mobile.length > 10) {
-      alert("mobile number must have 10 digits");
-    } else {
-      db.transaction(function(tx) {
-        tx.executeSql(
-          "INSERT INTO table_employee (name, email,password, address,area, mobile) VALUES (?,?,?,?,?,?)",
-          [name, email, password, address, area, mobile],
-          (tx, results) => {
-            console.log("Results", results.rowsAffected);
-            if (results.rowsAffected > 0) {
-              alert("Employee Created Successfully");
-            } else alert("Registration Failed");
-          },
-          error => {
-            console.log(error);
-          }
-        );
-      });
+
+  const handleSubmit = () => {
+    if (!name || !email || !password || !address || !area || !mobile) {
+      Alert.alert("Validation Error", "Please fill all fields.");
+      return;
     }
+    if (!email.endsWith("@gmail.com")) {
+      Alert.alert("Validation Error", "Please enter a valid Gmail address.");
+      return;
+    }
+    if (mobile.length !== 10) {
+      Alert.alert("Validation Error", "Mobile number must have 10 digits.");
+      return;
+    }
+
+    db.transaction((tx) => {
+      tx.executeSql(
+        "INSERT INTO table_employee (name, email, password, address, area, mobile) VALUES (?,?,?,?,?,?)",
+        [name, email, password, address, area, mobile],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            Alert.alert("Success", "Employee created successfully!");
+            setname("");
+            setemail("");
+            setpassword("");
+            setaddress("");
+            setarea("");
+            setmobile("");
+          } else {
+            Alert.alert("Error", "Failed to add employee.");
+          }
+        },
+        (error) => {
+          console.log("Insert Error:", error);
+        }
+      );
+    });
   };
-  const handleusernamechange = input => {
-    const newText = input.replace(/[^A-Za-z]/g, "");
-    setname(newText);
+
+  const handleusernamechange = (input) => {
+    setname(input.replace(/[^A-Za-z ]/g, "")); // only letters & spaces
   };
-  const handleaddresschange = input => {
-    const newText = input.replace(/[^A-Za-z]/g, "");
-    setaddress(newText);
+
+  const handleaddresschange = (input) => {
+    setaddress(input.replace(/[^A-Za-z0-9 ,.-]/g, "")); // letters, numbers, commas, etc.
   };
+
   return (
-    <View style={styles.Container}>
-      <Image
-        source={{
-          uri:
-            "https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw"
-        }}
-        style={{
-          marginLeft: "auto",
-          marginRight: "auto",
-          width: 100,
-          height: 100,
-          resizeMode: "contain"
-        }}
-      />
-      <Text style={styles.Text}>ADD EMPLOYEE</Text>
-      <View>
+    <ScrollView style={styles.container}>
+      <View style={styles.headerSection}>
+        <Image
+          source={{
+            uri: "https://play-lh.googleusercontent.com/QauqYhK_WcYkQM8-wfg1H8kABrSDlDHc4pYaN4Db5yO8uqISqxcp9cwGp9b_wJDOaak=w240-h480-rw",
+          }}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>Add Employee</Text>
+        <Text style={styles.subtitle}>Enter details to create new employee</Text>
+      </View>
+
+      <View style={styles.formCard}>
         <TextInput
           style={styles.input}
           onChangeText={handleusernamechange}
-          placeholderTextColor="black"
-          color="black"
           value={name}
           placeholder="Enter Name"
+          placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
-          onChangeText={txt => setemail(txt)}
-          color="black"
+          onChangeText={setemail}
           value={email}
           placeholder="Enter Email"
-          placeholderTextColor="black"
+          placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
-          onChangeText={txt => setpassword(txt)}
+          onChangeText={setpassword}
           value={password}
-          secureTextEntry={true}
-          color="black"
+          secureTextEntry
           placeholder="Enter Password"
-          placeholderTextColor="black"
+          placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
           onChangeText={handleaddresschange}
           value={address}
           placeholder="Enter Address"
-          color="black"
-          placeholderTextColor="black"
+          placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
-          onChangeText={txt => setarea(txt)}
+          onChangeText={setarea}
           value={area}
           placeholder="Enter Area"
-          color="black"
-          placeholderTextColor="black"
+          placeholderTextColor="#888"
         />
         <TextInput
           style={styles.input}
-          onChangeText={txt => setmobile(txt)}
+          onChangeText={setmobile}
           value={mobile}
+          keyboardType="numeric"
           placeholder="Enter Mobile"
-          color="black"
-          placeholderTextColor="black"
+          placeholderTextColor="#888"
         />
-        <Button
-          title="Save"
-          color="green"
-          style={{ borderRadius: "10px" }}
-          onPress={handleSubmit}
-        />
+
+        <TouchableOpacity style={styles.gradientButton} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  Container: {
-    margin: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: 30,
-    padding: 20
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF8F0",
   },
-  Text: {
-    fontSize: 22,
-    textAlign: "center",
-    color: "black"
+  headerSection: {
+    alignItems: "center",
+    marginBottom: 24,
+    backgroundColor: "#FFF3E0",
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: "#FFA726",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    elevation: 5,
+    margin: 16,
   },
-  Text1: {
-    fontSize: 19,
+  logo: {
+    width: 80,
+    height: 80,
+    resizeMode: "contain",
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#FB8C00",
+    marginBottom: 4,
     textAlign: "center",
-    color: "black"
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#FFB74D",
+    textAlign: "center",
+  },
+  formCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 20,
+    margin: 16,
+    shadowColor: "#FFA726",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   input: {
-    height: 40,
-    margin: 12,
+    height: 48,
+    marginBottom: 16,
     borderWidth: 1,
-    borderRadius: 10
-  }
+    borderColor: "#FFCC80",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#FFF3E0",
+    color: "#FB8C00",
+    fontSize: 16,
+  },
+  gradientButton: {
+    borderRadius: 8,
+    backgroundColor: "#FB8C00",
+    paddingVertical: 14,
+    shadowColor: "#FB8C00",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    marginTop: 8,
+  },
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center",
+  },
 });
 
 export default Addemployee;

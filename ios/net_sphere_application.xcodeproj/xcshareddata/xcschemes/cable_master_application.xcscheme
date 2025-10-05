@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "cable_master_application.app"
-               BlueprintName = "cable_master_application"
-               ReferencedContainer = "container:cable_master_application.xcodeproj">
+               BuildableName = "net_sphere_application.app"
+               BlueprintName = "net_sphere_application"
+               ReferencedContainer = "container:net_sphere_application.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "cable_master_applicationTests.xctest"
-               BlueprintName = "cable_master_applicationTests"
-               ReferencedContainer = "container:cable_master_application.xcodeproj">
+               BuildableName = "net_sphere_applicationTests.xctest"
+               BlueprintName = "net_sphere_applicationTests"
+               ReferencedContainer = "container:net_sphere_application.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "cable_master_application.app"
-            BlueprintName = "cable_master_application"
-            ReferencedContainer = "container:cable_master_application.xcodeproj">
+            BuildableName = "net_sphere_application.app"
+            BlueprintName = "net_sphere_application"
+            ReferencedContainer = "container:net_sphere_application.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "cable_master_application.app"
-            BlueprintName = "cable_master_application"
-            ReferencedContainer = "container:cable_master_application.xcodeproj">
+            BuildableName = "net_sphere_application.app"
+            BlueprintName = "net_sphere_application"
+            ReferencedContainer = "container:net_sphere_application.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

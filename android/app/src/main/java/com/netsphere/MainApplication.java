@@ -1,4 +1,4 @@
-package com.cable_master_application;
+package com.netsphere;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
